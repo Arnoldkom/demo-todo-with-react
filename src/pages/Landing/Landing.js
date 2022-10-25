@@ -1,24 +1,32 @@
-import { appwrite, github, twitter, react } from "../icons";
+import { useState } from "react";
+import { getAuth } from "firebase/auth";
+import { appwrite, github, react } from "../icons";
 import { useHistory } from "react-router-dom";
+import * as Stripe from "../../stripe/stripe-client";
+import Alert from "../../pages/Alert/Alert";
+import firebase from "../../firebase/firebase-config";
 
+const auth = getAuth(firebase.app());
 const Landing = () => {
   const history = useHistory();
+  const [status, setStatus] = useState(false);
 
-  const handleClick = () => {
-    history.push("/todos");
+  const handleClick = async () => {
+    const session = await Stripe.checkout('price_1LuGQaA5CgLxn7YpV2emzz2m');
+    console.log(session.url);
+    if(session.url){
+      setStatus(true);
+      history.push(session.url);
+    }
   };
 
   const links = [
     {
-      href: "http://github.com/appwrite/appwrite",
+      href: "https://github.com/Groupe-Beaucage/vente-en-ligne/issues/636",
       icon: github(10),
     },
     {
-      href: "https://twitter.com/appwrite_io",
-      icon: twitter(10),
-    },
-    {
-      href: "http://appwrite.io",
+      href: "https://kia.ca/",
       icon: appwrite(10),
     },
   ];
@@ -26,9 +34,10 @@ const Landing = () => {
   return (
     <>
       <section className="container h-screen mx-auto flex">
+          {status && <Alert color="green" message="Redirection vers le checkOut de stripe ..." />}
         <div className="flex flex-col mx-auto justify-center p-6 text-center">
           <p className="my-8 text-xl md:text-2xl lg:text-3xl font-medium">Introducing</p>
-          <h1 className="text-4xl md:text-7xl lg:text-9xl font-bold">toTooooDoooo</h1>
+          <h1 className="text-4xl md:text-7xl lg:text-9xl font-bold">Stripe Payment</h1>
           <p className="my-8 text-xl md:text-2xl lg:text-3xl font-medium">
             A Simple To-do App built with {appwrite(8)} Appwrite and {react(8)}{" "}
             React
